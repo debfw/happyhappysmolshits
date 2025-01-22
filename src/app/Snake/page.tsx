@@ -1,7 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { GiSnakeBite } from "react-icons/gi";
-import { VscCircleLarge } from "react-icons/vsc";
 
 // Color Generator with a range for brighter colors
 const colorGenerator = () => {
@@ -9,7 +7,7 @@ const colorGenerator = () => {
   let red = getRandom();
   let green = getRandom();
   let blue = getRandom();
-  return `rgb(${red}, ${green}, ${blue})`; // Return random color in RGB format
+  return `rgb(${red}, ${green}, ${blue})`;
 };
 
 const Snake = () => {
@@ -26,12 +24,23 @@ const Snake = () => {
     yHeartPosition: 350
   });
   const [direction, setDirection] = useState("Right");
-  const [isMoving, setIsMoving] = useState(false); // Track if the snake should move
-  const [isGameOver, setIsGameOver] = useState(false); // Track if the game is over
+  const [isMoving, setIsMoving] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
   const [speed, setSpeed] = useState(80);
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
+
+  const getRandomHeartPosition = () => {
+    const margin = 100;
+    const getRandom = (max: number, margin: number) =>
+      Math.floor(Math.random() * (max - 2 * margin)) + margin;
+
+    setHeartPosition({
+      xHeartPosition: getRandom(viewportWidth, margin),
+      yHeartPosition: getRandom(viewportHeight, margin)
+    });
+  };
 
   // Initial snake
   useEffect(() => {
@@ -106,7 +115,6 @@ const Snake = () => {
       if (isMoving) {
         setSnakePosition((prevPosition) => {
           let newPosition = { ...prevPosition };
-
           switch (direction) {
             case "Up":
               newPosition.yPosition -= 10;
@@ -145,12 +153,19 @@ const Snake = () => {
     };
   }, [direction, isMoving]);
 
+  const tolerance = 20;
   useEffect(() => {
+    const isWithinTolerance = (heartPosition: number, snakePosition: number) =>
+      Math.abs(heartPosition - snakePosition) <= tolerance;
     if (
-      heartPosition.xHeartPosition === snakePosition.xPosition &&
-      heartPosition.yHeartPosition === snakePosition.yPosition
+      isWithinTolerance(
+        heartPosition.xHeartPosition,
+        snakePosition.xPosition
+      ) &&
+      isWithinTolerance(heartPosition.yHeartPosition, snakePosition.yPosition)
     ) {
       setEats(true);
+      getRandomHeartPosition();
     }
   }, [snakePosition, heartPosition]);
 
@@ -209,7 +224,7 @@ const Snake = () => {
           position: "absolute",
           top: `${heartPosition.yHeartPosition}px`,
           left: `${heartPosition.xHeartPosition}px`,
-          fontSize: "30px"
+          fontSize: "35px"
         }}
       >
         ♥
